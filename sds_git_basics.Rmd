@@ -1,0 +1,388 @@
+---
+title: "sds_git_basics"
+author: "Dulcie Vousden, DataKind UK"
+date: "23/03/2020"
+output: 
+  html_document: 
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,eval=FALSE)
+```
+
+```{r, echo=FALSE}
+setwd("~/Desktop/")
+```
+
+## First things first
+
+Much of this tutorial was taken from the full git tutorial from software carpentry: https://swcarpentry.github.io/git-novice/ (under create commons license). It will be more detailed and more informative than this one!
+
+
+
+## Getting started
+
+When we use Git on a new computer for the first time,
+we need to configure a few things. Below are a few examples
+of configurations we will set as we get started with Git:
+
+*   our name and email address,
+*   what our preferred text editor is,
+*   and that we want to use these settings globally (i.e. for every project).
+
+On a command line, Git commands are written as `git verb options`,
+where `verb` is what we actually want to do and `options` is additional optional information which may be needed for the `verb`. 
+
+```{bash}
+git config --global user.name "Dulcie Vousden"
+git config --global user.email "dulcievousden@gmail.com"
+```
+
+
+Please use your own name and email address instead of mine. If you already have a github account, this should be the same email address you used for that.
+If you don't ignore this.
+This user name and email will be associated with your subsequent Git activity,
+which means that any changes pushed to
+[GitHub](https://github.com/),
+[BitBucket](https://bitbucket.org/),
+[GitLab](https://gitlab.com/) or
+another Git host server
+in a later lesson will include this information.
+
+
+
+Once Git is configured,
+we can start using it.
+
+## Creating a repository
+
+First, let's create a directory in `Desktop` folder for our work and then move into that directory:
+
+```{bash}
+cd ~/Desktop
+mkdir to_do
+cd to_do
+pwd
+```
+
+
+Then we tell Git to make `to_do` a [repository]({{ page.root }}{% link reference.md %}#repository)—a place where Git can store versions of our files:
+A Git repository is a place where git can store versions of your files.  It stores both the files and the changes to the files.
+To set up a repository we use git init
+```{bash}
+git init
+```
+
+
+It is important to note that `git init` will create a repository that
+includes subdirectories and their files---there is no need to create
+separate repositories nested within the `to_do` repository, whether
+subdirectories are present from the beginning or added later. Also, note
+that the creation of the `to_do` directory and its initialization as a
+repository are completely separate processes.
+
+If we use `ls` to show the directory's contents,
+it appears that nothing has changed:
+
+```{bash}
+ls
+```
+
+
+But if we add the `-a` flag to show everything,
+we can see that Git has created a hidden directory within `to_do` called `.git`:
+
+```{bash}
+ls -a
+```
+
+
+Git uses this special subdirectory to store all the information about the project, 
+including all files and sub-directories located within the project's directory.
+If we ever delete the `.git` subdirectory,
+we will lose the project's history.
+
+We can check that everything is set up correctly
+by asking Git to tell us the status of our project:
+
+```{bash}
+git status
+```
+
+If you are using a different version of `git`, the exact
+wording of the output might be slightly different.
+
+## Adding and tracking files
+
+Let's create a file called `shopping.txt` that contains some notes
+We'll use `nano` to edit the file;
+you can use whatever editor you like.
+
+
+```{bash}
+touch shopping.txt
+```
+
+
+
+Type the text below into the `shopping.txt` file:
+
+**loo roll**
+
+`shopping.txt` contains a single line, which we can see by running:
+
+```{bash}
+cat shopping.txt
+```
+
+
+
+If we check the status of our project again,
+Git tells us that it's noticed the new file:
+
+```{bash}
+git status
+```
+
+
+
+The "untracked files" message means that there's a file in the directory
+that Git isn't keeping track of.
+We can tell Git to track a file using `git add`:
+
+```{bash}
+git add shopping.txt
+```
+
+
+and then check that the right thing happened:
+
+```{bash}
+git status
+```
+
+
+
+Git now knows that it's supposed to keep track of `shopping.txt`,
+but it hasn't recorded these changes as a commit yet.
+To get it to do that,
+we need to run one more command:
+
+```{bash}
+git commit -m "Started shopping list"
+```
+
+
+When we run `git commit`,
+Git takes everything we have told it to save by using `git add`
+and stores a copy permanently inside the special `.git` directory.
+This permanent copy is called a  commit
+
+We use the `-m` flag (for "message")
+to record a short, descriptive, and specific comment that will help us remember later on what we did and why.
+If we just run `git commit` without the `-m` option,
+Git will launch `nano` (or whatever other editor we configured as `core.editor`)
+so that we can write a longer message.
+
+[Good commit messages][commit-messages] start with a brief (<50 characters) statement about the
+changes made in the commit. Generally, the message should complete the sentence "If applied, this commit will" <commit message here>.
+If you want to go into more detail, add a blank line between the summary line and your additional notes. Use this additional space to explain why you made changes and/or what their impact will be.
+
+If we run `git status` now:
+
+```{bash}
+git status
+```
+
+
+it tells us everything is up to date.
+If we want to know what we've done recently,
+we can ask Git to show us the project's history using `git log`:
+
+```{bash}
+git log
+```
+
+
+
+`git log` lists all commits  made to a repository in reverse chronological order.
+The listing for each commit includes
+the commit's full identifier
+(which starts with the same characters as
+the short identifier printed by the `git commit` command earlier),
+the commit's author,
+when it was created,
+and the log message Git was given when the commit was created.
+
+
+Now suppose you add more information to the file. Using nano, add **soap** to the shopping list
+
+
+```{bash}
+git status
+```
+
+
+
+
+```{bash}
+git commit -m "added item to shopping list"
+git status
+```
+
+
+
+Whoops:
+Git won't commit because we didn't use `git add` first.
+Let's fix that:
+
+```{bash}
+git add shopping.txt
+git commit -m "added item to shopping list"
+```
+
+
+
+
+Git insists that we add files to the set we want to commit
+before actually committing anything. 
+To allow for this,
+Git has a special *staging area*
+where it keeps track of things that have been added to
+the current changeset but not commited yet
+
+
+
+
+
+To recap, when we want to add changes to our repository,
+we first need to add the changed files to the staging area
+(`git add`) and then commit the staged changes to the
+repository (`git commit`)
+
+
+## Remote repositories
+
+
+Version control really comes into its own when we begin to collaborate with
+other people.  We already have most of the machinery we need to do this; the
+only thing missing is to copy changes from one repository to another.
+
+Systems like Git allow us to move work between any two repositories.  In
+practice, though, it's easiest to use one copy as a central hub, and to keep it
+on the web rather than on someone's laptop.  Most programmers use hosting
+services like [GitHub](https://github.com), [Bitbucket](https://bitbucket.org) or
+[GitLab](https://gitlab.com/) to hold those master copies
+
+Let's start by sharing the changes we've made to our current project with the
+world. 
+
+Go to GitHub: www.github.com and create an account
+You don't have to do this part if you don't want to
+
+If you do, use the same email address as you set in the git config
+- you can ignore the survey
+- you'll have to confirm in your email
+
+Log in to GitHub, then click on the icon in the top right corner to
+create a new repository called `to_do`:
+
+Name your repository "to_do" and then click "Create Repository".
+
+Note: Since this repository will be connected to a local repository, it needs to be empty. Leave 
+"Initialize this repository with a README" unchecked, and keep "None" as options for both "Add 
+.gitignore" and "Add a license." See the "GitHub License and README files" exercise below for a full 
+explanation of why the repository needs to be empty.
+
+
+As soon as the repository is created, GitHub displays a page with a URL and some
+information on how to configure your local repository:
+
+This effectively does the following on GitHub's servers:
+
+- mkdir to_do
+- cd to_do
+- git init
+
+
+Note that our local repository still contains our earlier work on `shopping.txt`, but the
+remote repository on GitHub appears empty as it doesn't contain any files yet.
+
+The next step is to connect the two repositories.  We do this by making the
+GitHub repository a remote  for the local repository.
+The home page of the repository on GitHub includes the string we need to
+identify it:
+
+
+```{bash}
+git remote add origin https://github.com/dvousden/to_do.git
+```
+
+
+Make sure to use the URL for your repository rather than mine: the only
+difference should be your username instead of `dvousden`.
+
+`origin` is a local name used to refer to the remote repository. It could be called
+anything, but `origin` is a convention that is often used by default in git
+and GitHub, so it's helpful to stick with this unless there's a reason not to.
+
+We can check that the command has worked by running `git remote -v`:
+
+```{bash}
+git remote -v
+```
+
+
+Once the remote is set up, this command will push the changes from
+our local repository to the repository on GitHub:
+
+```{bash}
+git push origin master
+```
+
+
+
+
+We can pull changes from the remote repository to the local one as well:
+
+```{bash}
+git pull origin master
+```
+
+
+
+Pulling has no effect in this case because the two repositories are already
+synchronized.  If someone else had pushed some changes to the repository on
+GitHub, though, this command would download them to our local repository.
+
+
+Lastly, let's suppose you want to download someone else's code. You can do this using git clone
+
+```{bash}
+git clone https://github.com/dvousden/sds_git_tutorial.git ~/Desktop/sds_git_tutorial/
+```
+
+Then, depending on the owner's settings, you can make changes and push them to the owner's repository.
+Or alternatively, you can make your own branch, make changes, and choose when to merge them later.
+
+The trick is that with git clone you've copied all these notes. :-)
+
+Back to presentation!
+
+
+## Key points
+
+- "`git init` initializes a repository."
+- "Git stores all of its repository data in the `.git` directory."
+- '`git status` shows the status of a repository.'
+- Files can be stored in a project's working directory (which users see), the staging
+  area (where the next commit is being built up) and the local repository (where commits
+  are permanently recorded).
+- '`git add` puts files in the staging area.'
+- '`git commit` saves the staged content as a new commit in the local repository.'
+- "A local Git repository can be connected to one or more remote repositories."
+- "Use the HTTPS protocol to connect to remote repositories until you have learned how to set up SSH."
+- "`git push` copies changes from a local repository to a remote repository."
+- "`git pull` copies changes from a remote repository to a local repository."
+- "`git clone` copies a remote repository to create a local repository with a remote called `origin` automatically set up."
